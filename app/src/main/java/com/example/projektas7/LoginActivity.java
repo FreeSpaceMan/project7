@@ -2,7 +2,9 @@ package com.example.projektas7;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,10 +12,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
 
     EditText username, password;
     Button btnLogin;
     DatabaseHelper DB;
+
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +30,9 @@ public class LoginActivity extends AppCompatActivity {
         password = (EditText)findViewById(R.id.password_logPg);
         btnLogin = (Button)findViewById(R.id.button_signin_logPg);
         DB = new DatabaseHelper(this);
+
+
+
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override

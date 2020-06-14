@@ -4,4 +4,7 @@
     <string name="signin">signin</string>
     <string name="existingusergoto">Existing user? Go to sign in page!</string>
     <string name="login">login</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
