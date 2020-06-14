@@ -3,4 +3,5 @@
     <string name="register">register</string>
     <string name="signin">signin</string>
     <string name="existingusergoto">Existing user? Go to sign in page!</string>
+    <string name="login">login</string>
 </resources>
