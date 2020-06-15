@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: "androidx.navigation.safeargs"
 
 
-
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -59,8 +58,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     // Mapbox dependancies. Check if there are newer versions of dependencies below
-//    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.0.1'
-//    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.0'
-//    implementation 'androidx.navigation:navigation-fragment:2.2.2'
-//    implementation 'androidx.navigation:navigation-ui:2.2.2'
+
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.0.1'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.0'
 }
