@@ -14,6 +14,7 @@ import android.widget.Toast;
 public class LoginActivity extends AppCompatActivity {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    private static final String USER = "user";
 
     EditText username, password;
     Button btnLogin;
@@ -31,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button)findViewById(R.id.button_signin_logPg);
         DB = new DatabaseHelper(this);
 
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+
 
 
 
@@ -47,14 +50,26 @@ public class LoginActivity extends AppCompatActivity {
                     Boolean checkuserpass = DB.checkusernamepassword(user, pass);
                     if(checkuserpass) {
                         Toast.makeText(LoginActivity.this,"Sign in is successful",Toast.LENGTH_SHORT).show();
+                        saveUser(user, pass);
                         Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
                         startActivity(intent);
                     }else{
                         Toast.makeText(LoginActivity.this,"Invalid Credentials", Toast.LENGTH_SHORT).show();
                     }
                 }
-
             }
         });
+    }
+
+    public void saveUser(String user, String password) {
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        //editor.putInt(ID, user.getId());
+        editor.putString(USER, user);
+        editor.putString(PASSWORD, password);
+        //editor.putString(VARDAS, user.getVardas());
+        //editor.putInt(AMZIUS, user.getAmzius());
+        editor.commit();
+
     }
 }

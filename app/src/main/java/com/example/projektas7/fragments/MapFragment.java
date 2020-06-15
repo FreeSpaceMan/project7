@@ -13,9 +13,9 @@ import com.example.projektas7.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SecondFragment extends Fragment {
+public class MapFragment extends Fragment {
 
-    public SecondFragment() {
+    public MapFragment() {
         // Required empty public constructor
     }
 
@@ -24,6 +24,6 @@ public class SecondFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_second, container, false);
+        return inflater.inflate(R.layout.fragment_map, container, false);
     }
 }

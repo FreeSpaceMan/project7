@@ -29,5 +29,7 @@ public class HomeActivity extends AppCompatActivity {
 
         manager.beginTransaction().add(R.id.homeActivityLayout,firstFragment).commit();
 
+
+
     }
 }
