@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
@@ -33,6 +34,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LocationEngine locationEngine;
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +44,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        textView = (TextView)findViewById(R.id.coords_print);
+
+
     }
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
         enableLocation();
+
+        String latitudeTxt = String.valueOf(locationEngine.getLastLocation().getLatitude());
+        String longitudeTxt = String.valueOf(locationEngine.getLastLocation().getLongitude());
+
+        textView.setText(String.format(getString(R.string.new_location),
+                latitudeTxt,
+                longitudeTxt));
+        Toast.makeText(this, String.format(getString(R.string.new_location),
+                latitudeTxt,
+                longitudeTxt),
+                Toast.LENGTH_SHORT).show();
+
     }
 
     private void enableLocation() {
