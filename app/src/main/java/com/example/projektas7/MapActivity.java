@@ -36,6 +36,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location originLocation;
     private TextView textView;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +56,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map = mapboxMap;
         enableLocation();
 
-        String latitudeTxt = String.valueOf(locationEngine.getLastLocation().getLatitude());
-        String longitudeTxt = String.valueOf(locationEngine.getLastLocation().getLongitude());
+        Coordinates.latitude = locationEngine.getLastLocation().getLatitude();
+        Coordinates.longitude = locationEngine.getLastLocation().getLongitude();
+
+        String latitudeTxt = String.valueOf(Coordinates.latitude);
+        String longitudeTxt = String.valueOf(Coordinates.longitude);
+
 
         textView.setText(String.format(getString(R.string.new_location),
                 latitudeTxt,
@@ -80,10 +86,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @SuppressWarnings("MissingPermission")
     private void initializeLocationEngine() {
-        locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
-        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-        locationEngine.activate();
+        locationEngine = LocationEngineFactory.getLocationEngine(this);
 
+//        locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
+//        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+//        locationEngine.activate();
+//        Location lastLocation = locationEngine.getLastLocation();
+//        if(lastLocation != null) {
+//            originLocation = lastLocation;
+//            setCameraPosition(lastLocation);
+//        } else {
+//            locationEngine.addLocationEngineListener(this);
+//        }
+
+        setLocationProperties();
+    }
+
+    public void setLocationProperties() {
         Location lastLocation = locationEngine.getLastLocation();
         if(lastLocation != null) {
             originLocation = lastLocation;

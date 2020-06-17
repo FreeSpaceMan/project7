@@ -26,6 +26,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        Coordinates.latitude = 15;
+        Coordinates.longitude = 56;
+
+
         btnGoToMap = (Button)findViewById(R.id.button_goToMap);
         btnGoToMap.setOnClickListener(new View.OnClickListener() {
             @Override
