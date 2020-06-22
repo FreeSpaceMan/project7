@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     Button signup, signin;
     DatabaseHelper DB;
 
+
     ///////////////////////////
     TextView textViewRestApi;
 
@@ -42,33 +43,37 @@ public class MainActivity extends AppCompatActivity {
         signin = (Button)findViewById(R.id.button_signin);
         DB = new DatabaseHelper(this);
 
+        RetrofitHelper retrofitHelper = new RetrofitHelper();
+
     ///////////////////////////////
     textViewRestApi = findViewById(R.id.textViewRESTAPI);
 
 //////////////////////////////
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.47:80/")
-                .addConverterFactory(MoshiConverterFactory.create())
-                .build();
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("http://192.168.1.47:80/")
+//                .addConverterFactory(MoshiConverterFactory.create())
+//                .build();
 
-        ApiService apiService = retrofit.create(ApiService.class);
+        ApiService apiService = retrofitHelper.retrofitHelp().create(ApiService.class);
 
         Call<ResponseBody> call = apiService.getHome();
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                if (!response.isSuccessful()) {
-//                    textViewRestApi.setText("Code:"+response.code());
-//                    return;
-//                }
-                ResponseBody responseBody = response.body();
-                try {
-                    Log.d("LoginPage",responseBody.string());
-                    textViewRestApi.setText(responseBody.string());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (!response.isSuccessful()) {
+                    textViewRestApi.setText("Code:"+response.code());
+                    return;
                 }
+                ResponseBody result = response.body();
+
+                    try {
+                        Log.d("LoginPage",result.string());
+                        textViewRestApi.setText("RETROFIT WORKS. THIS TEXT CAN BE UPDATED IN TRY CATCH PART");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
             }
 
             @Override
