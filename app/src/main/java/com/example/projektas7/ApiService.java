@@ -12,6 +12,12 @@ public interface ApiService {
     @GET("home")
     Call<ResponseBody> getHome();
 
+
+    @FormUrlEncoded
+    @POST("register")
+    Call<User> register(@Field("username") String username, @Field("password") String password);
+
+
     @FormUrlEncoded
     @POST("login")
     Call<User> login(@Field("username") String username, @Field("password") String password);
