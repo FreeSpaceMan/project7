@@ -22,7 +22,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText username, password, repassword;
+    EditText name,surname,email,username, password, repassword;
     Button signup, signin;
     DatabaseHelper DB;
 
@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        name = (EditText)findViewById(R.id.name);
+        surname = (EditText)findViewById(R.id.surname);
+        email = (EditText)findViewById(R.id.email);
         username = (EditText)findViewById(R.id.username);
         password=(EditText)findViewById(R.id.password);
         repassword = (EditText)findViewById(R.id.repassword);
@@ -45,14 +48,10 @@ public class MainActivity extends AppCompatActivity {
 
         RetrofitHelper retrofitHelper = new RetrofitHelper();
 
-    ///////////////////////////////
+
     textViewRestApi = findViewById(R.id.textViewRESTAPI);
 
-//////////////////////////////
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl("http://192.168.1.47:80/")
-//                .addConverterFactory(MoshiConverterFactory.create())
-//                .build();
+
 
         ApiService apiService = retrofitHelper.retrofitHelp().create(ApiService.class);
 
@@ -86,68 +85,39 @@ public class MainActivity extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String nameOfUser = name.getText().toString();
+                String surnameOfUser = surname.getText().toString();
+                String emailOfUser = email.getText().toString();
                 String user = username.getText().toString();
                 String pass = password.getText().toString();
                 String repass = repassword.getText().toString();
 
                 if(user.equals("") || pass.equals("") || repass.equals("")) {
-                    Toast.makeText(MainActivity.this,"Please enter all the fields", Toast.LENGTH_SHORT).show(); // this bit is ok
+                    Toast.makeText(MainActivity.this,"Please enter all the mandatory fields", Toast.LENGTH_SHORT).show(); // this bit is ok
                 }
+                //TODO need to check when registering if the username is not taken already. Could this be done by modyfing the login code?
                 if(pass.equals(repass)){
-                    apiService.register(""+user,""+pass).enqueue(new Callback<User>() {
+                    apiService.register(
+                            ""+nameOfUser,
+                            ""+surnameOfUser,
+                            ""+emailOfUser,
+                            ""+user,
+                            ""+pass).enqueue(new Callback<ResponseBody>() {
                         @Override
-                        public void onResponse(Call<User> call, Response<User> response) {
-                            if (response.isSuccessful()) {
-                                Toast.makeText(MainActivity.this,"Registration was successful",Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
-                                startActivity(intent);
-                            } else {
-                                Log.d("LoginPage","Failed to log in. Only to be seen in logcat");
-                                Toast.makeText(MainActivity.this,"something went wrong", Toast.LENGTH_SHORT).show();
-                            }
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Log.d("REGISTRATION","SOMETHING ATLEAST WORKS");
+                            Toast.makeText(MainActivity.this,"Registration was successful",Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
+                            startActivity(intent);
+
                         }
                         @Override
-                        public void onFailure(Call<User> call, Throwable t) {
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
                             t.printStackTrace();
                         }
                     });
                 }
-
-//
-//
-//
-//
-//                    if(pass.equals(repass)) {
-//                        Boolean checkuser = DB.checkusername(user); // this needs to be updated
-//                        if(checkuser==false){
-//                            Boolean insert = DB.insertData(user,pass); //this needs to be updated
-//                            if(insert==true) {
-//                                Toast.makeText(MainActivity.this,"Registered successfully",Toast.LENGTH_SHORT).show(); // this is probably ok
-//                                Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
-//                                startActivity(intent);
-//                            }else{
-//                                Toast.makeText(MainActivity.this,"Registration failed", Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                        else{
-//                            Toast.makeText(MainActivity.this,"User already exists. Please sign in",Toast.LENGTH_SHORT).show();
-//                        }
-//                    }else{
-//                        Toast.makeText(MainActivity.this,"Passwords not matching", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//
-//            }
         }});
-
-
-
-
-
-
-
-
-
 
 //        signup.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -185,10 +155,8 @@ public class MainActivity extends AppCompatActivity {
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
                 startActivity(intent);
-
             }
         });
     }

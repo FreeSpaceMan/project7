@@ -15,10 +15,15 @@ public interface ApiService {
 
     @FormUrlEncoded
     @POST("register")
-    Call<User> register(@Field("username") String username, @Field("password") String password);
+    Call<ResponseBody> register(@Field("name") String name, //need to update Mainactivity code
+                        @Field("surname") String surname, //need to update Mainactivity code
+                        @Field("email") String email, //need to update Mainactivity code
+                        @Field("username") String username,
+                        @Field("password") String password);
 
 
     @FormUrlEncoded
     @POST("login")
-    Call<User> login(@Field("username") String username, @Field("password") String password);
+    Call<User> login(@Field("username") String username,
+                     @Field("password") String password);
 }
