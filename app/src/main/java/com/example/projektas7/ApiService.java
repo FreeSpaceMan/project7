@@ -12,7 +12,6 @@ public interface ApiService {
     @GET("home")
     Call<ResponseBody> getHome();
 
-
     @FormUrlEncoded
     @POST("register")
     Call<ResponseBody> register(@Field("name") String name, //need to update Mainactivity code
@@ -26,4 +25,13 @@ public interface ApiService {
     @POST("login")
     Call<User> login(@Field("username") String username,
                      @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("messageIn")
+    Call<ResponseBody> insertMessage(@Field("message") String message,
+                                     @Field("userId") String userId,
+                                     @Field("username") String username,
+                                     @Field("latitude") String latitude,
+                                     @Field("longitude") String longitude);
+
 }

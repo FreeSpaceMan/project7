@@ -3,11 +3,18 @@ package com.example.projektas7;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.internal.$Gson$Preconditions;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -26,6 +33,17 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.example.projektas7.LoginActivity.EMAIL;
+import static com.example.projektas7.LoginActivity.ID;
+import static com.example.projektas7.LoginActivity.NAME;
+import static com.example.projektas7.LoginActivity.SURNAME;
+import static com.example.projektas7.LoginActivity.USERNAME;
+
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
 
     private MapView mapView;
@@ -35,8 +53,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
     private TextView textView;
-
-
+    private EditText messagingInput;
+    private Button btnChatSend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +65,45 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
         textView = (TextView)findViewById(R.id.coords_print);
+        btnChatSend = (Button)findViewById(R.id.button_chatbox_send);
+
+        SharedPreferences sharedPref = getSharedPreferences("UserData", MODE_PRIVATE);
+
+        messagingInput=(EditText)findViewById(R.id.messaging_input);
+        RetrofitHelper retrofitHelper = new RetrofitHelper();
+        ApiService apiService = retrofitHelper.retrofitHelp().create(ApiService.class);
+
+        btnChatSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String messageSent = messagingInput.getText().toString();
+                String userIdX = sharedPref.getString(ID,"");
+                String usernameX = sharedPref.getString(USERNAME,"");
+
+                if(messageSent.equals("")){
+                    Toast.makeText(MapActivity.this,"Please insert a message", Toast.LENGTH_SHORT).show();
+                }else{
+                    apiService.insertMessage(""+messageSent,
+                            ""+userIdX,
+                            ""+usernameX,
+                            ""+ Coordinates.latitude,
+                            ""+ Coordinates.longitude).enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Log.d("MapActivity","SUCCESS");
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Log.d("MapActivity","FAILURE");
+                            t.printStackTrace();
+                        }
+                    });
+                }
+
+            }
+        });
+
 
 
     }

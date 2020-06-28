@@ -17,15 +17,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String SURNAME = "surname";
+    public static final String EMAIL ="email";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
-    private static final String USER = "user";
 
     EditText username, password;
     Button btnLogin;
     DatabaseHelper DB;
 
-    SharedPreferences sharedPref;
+    private SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,9 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button)findViewById(R.id.button_signin_logPg);
         DB = new DatabaseHelper(this);
 
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
+//        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("UserData",MODE_PRIVATE);
+
 
 
         RetrofitHelper retrofitHelper = new RetrofitHelper();
@@ -55,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onResponse(Call<User> call, Response<User> response) {
                     User user = response.body();
                     if (response.isSuccessful()) {
+                        saveUser(user);
                         Toast.makeText(LoginActivity.this,"Sign in is successful",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
                         startActivity(intent);
@@ -91,17 +97,39 @@ public class LoginActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
+
     }
 
-    public void saveUser(String user, String password) {
 
+    public void saveUser(User user){
         SharedPreferences.Editor editor = sharedPref.edit();
-        //editor.putInt(ID, user.getId());
-        editor.putString(USER, user);
-        editor.putString(PASSWORD, password);
-        //editor.putString(VARDAS, user.getVardas());
-        //editor.putInt(AMZIUS, user.getAmzius());
-        editor.commit();
+        editor.putString(ID,String.valueOf(user.getId()));
+        editor.putString(NAME,user.getName());
+        editor.putString(SURNAME,user.getSurname());
+        editor.putString(EMAIL,user.getEmail());
+        editor.putString(USERNAME,user.getUsername());
+        editor.putString(PASSWORD,user.getPassword());
 
+        editor.commit();
+    }
+//
+    public User getUser(){
+        int id = sharedPref.getInt(ID,-1);
+        String name = sharedPref.getString(NAME,"");
+        String surname = sharedPref.getString(SURNAME,"");
+        String email = sharedPref.getString(EMAIL,"");
+        String username = sharedPref.getString(USERNAME,"");
+        String password = sharedPref.getString(PASSWORD,"");
+
+        User user = new User();
+
+        user.setId(id);
+        user.setName(name);
+        user.setSurname(surname);
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(password);
+
+        return user;
     }
 }
