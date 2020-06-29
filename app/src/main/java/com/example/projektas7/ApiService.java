@@ -1,5 +1,7 @@
 package com.example.projektas7;
 
+import java.util.List;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -33,5 +35,10 @@ public interface ApiService {
                                      @Field("username") String username,
                                      @Field("latitude") String latitude,
                                      @Field("longitude") String longitude);
+
+    // zemiau darau pagal CodingInFlow tutorial'a https://www.youtube.com/watch?v=4JGvDUlfk7Y&vl=en
+    @GET("getMessages")
+//    Call<JSONResponse> getMePosts();
+    Call<List<UserMessages>> getMePosts();
 
 }

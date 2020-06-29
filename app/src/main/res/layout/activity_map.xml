@@ -6,12 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity">
 
-    <TextView
-        android:id="@+id/coords_print"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="bawls"
-        mapbox:layout_constraintBottom_toTopOf="@+id/mapView" />
+
+
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                mapbox:layout_constraintBottom_toTopOf="@+id/layout_chatbox">
+            <TextView
+                android:id="@+id/check_sql"
+                android:layout_width="match_parent"
+                android:layout_margin="10dp"
+                android:textSize="30sp"
+                android:layout_height="wrap_content"
+                />
+            </androidx.core.widget.NestedScrollView>
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
@@ -55,9 +64,9 @@
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:layout_width="64dp"
-            android:layout_height="48dp"
+            android:layout_height="match_parent"
 
-            android:gravity="top"
+            android:gravity="center"
             android:layout_gravity="top" />
 
     </LinearLayout>

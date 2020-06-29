@@ -22,6 +22,7 @@ import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -31,6 +32,8 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -46,15 +49,17 @@ import static com.example.projektas7.LoginActivity.USERNAME;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
 
-    private MapView mapView;
+    private MapView mapView = null;
     private MapboxMap map;
     private PermissionsManager permissionsManager;
     private LocationEngine locationEngine;
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
-    private TextView textView;
+    private TextView textView,textViewMessages;
     private EditText messagingInput;
     private Button btnChatSend;
+    private ArrayList<UserMessages> data;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-        textView = (TextView)findViewById(R.id.coords_print);
+
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                MarkerOptions options = new MarkerOptions();
+                options.title("Current position");
+                options.position(new LatLng(Coordinates.latitude+1,Coordinates.longitude+1));
+                mapboxMap.addMarker(options);
+            }
+        });
+
+
+
+
+
+        textViewMessages = (TextView)findViewById(R.id.check_sql);
         btnChatSend = (Button)findViewById(R.id.button_chatbox_send);
 
         SharedPreferences sharedPref = getSharedPreferences("UserData", MODE_PRIVATE);
@@ -83,6 +103,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if(messageSent.equals("")){
                     Toast.makeText(MapActivity.this,"Please insert a message", Toast.LENGTH_SHORT).show();
                 }else{
+
                     apiService.insertMessage(""+messageSent,
                             ""+userIdX,
                             ""+usernameX,
@@ -104,12 +125,56 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
+//        Call<JSONResponse> call = apiService.getMePosts();
+//        call.enqueue(new Callback<JSONResponse>() {
+//            @Override
+//            public void onResponse(Call<JSONResponse> call, Response<JSONResponse> response) {
+//                JSONResponse jsonResponse = response.body();
+//                data = new ArrayList<>(Arrays.asList(jsonResponse.getMessageFromList()));
+//            }
+//            @Override
+//            public void onFailure(Call<JSONResponse> call, Throwable t) {
+//                Log.d("Error", t.getMessage());
+//            }
+//        });
+
+        Call<List<UserMessages>> call = apiService.getMePosts();
+        call.enqueue(new Callback<List<UserMessages>>() {
+            @Override
+            public void onResponse(Call<List<UserMessages>> call, Response<List<UserMessages>> response) {
+                if (!response.isSuccessful()){
+                    textViewMessages.setText("Code: " + response.code());
+                    return;
+                }
+
+                List<UserMessages> userMessages = response.body();
+
+                for (UserMessages uMessage : userMessages){
+                    String content = "";
+                    content += "Username: " + uMessage.getUsername() + "\n";
+                    content += "Message: " + uMessage.getMessage()+ "\n";
+
+                    textViewMessages.append(content);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<UserMessages>> call, Throwable t) {
+                Log.d("Error", t.getMessage());
+            }
+        });
 
 
     }
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
+
+
+
+
+
+
         map = mapboxMap;
         enableLocation();
 
