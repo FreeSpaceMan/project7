@@ -2,6 +2,8 @@ package com.example.projektas7;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -58,7 +60,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private TextView textView,textViewMessages;
     private EditText messagingInput;
     private Button btnChatSend;
-    private ArrayList<UserMessages> data;
+
+
+    ArrayList<UserMessages> usersMessages = new ArrayList<>();
+    private UserAdapter userAdapter;
+    private RecyclerView userMessages_recyclerview;
+
+
+
+
 
 
     @Override
@@ -70,21 +80,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                MarkerOptions options = new MarkerOptions();
-                options.title("Current position");
-                options.position(new LatLng(Coordinates.latitude+1,Coordinates.longitude+1));
-                mapboxMap.addMarker(options);
-            }
-        });
+
+        userMessages_recyclerview=(RecyclerView)findViewById(R.id.streaming_list);
+        userMessages_recyclerview.setLayoutManager(new LinearLayoutManager(this));
 
 
 
 
-
-        textViewMessages = (TextView)findViewById(R.id.check_sql);
+//        textViewMessages = (TextView)findViewById(R.id.check_sql);
         btnChatSend = (Button)findViewById(R.id.button_chatbox_send);
 
         SharedPreferences sharedPref = getSharedPreferences("UserData", MODE_PRIVATE);
@@ -125,55 +128,51 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-//        Call<JSONResponse> call = apiService.getMePosts();
-//        call.enqueue(new Callback<JSONResponse>() {
-//            @Override
-//            public void onResponse(Call<JSONResponse> call, Response<JSONResponse> response) {
-//                JSONResponse jsonResponse = response.body();
-//                data = new ArrayList<>(Arrays.asList(jsonResponse.getMessageFromList()));
-//            }
-//            @Override
-//            public void onFailure(Call<JSONResponse> call, Throwable t) {
-//                Log.d("Error", t.getMessage());
-//            }
-//        });
+
+
+
+
 
         Call<List<UserMessages>> call = apiService.getMePosts();
+
         call.enqueue(new Callback<List<UserMessages>>() {
             @Override
             public void onResponse(Call<List<UserMessages>> call, Response<List<UserMessages>> response) {
-                if (!response.isSuccessful()){
-                    textViewMessages.setText("Code: " + response.code());
-                    return;
-                }
-
-                List<UserMessages> userMessages = response.body();
-
-                for (UserMessages uMessage : userMessages){
-                    String content = "";
-                    content += "Username: " + uMessage.getUsername() + "\n";
-                    content += "Message: " + uMessage.getMessage()+ "\n";
-
-                    textViewMessages.append(content);
-                }
+                usersMessages = new ArrayList<>(response.body());
+                userAdapter = new UserAdapter(MapActivity.this,usersMessages);
+                userMessages_recyclerview.setAdapter(userAdapter);
             }
-
             @Override
             public void onFailure(Call<List<UserMessages>> call, Throwable t) {
                 Log.d("Error", t.getMessage());
+                Toast.makeText(MapActivity.this,"Failed to load messages",Toast.LENGTH_SHORT).show();
+
             }
         });
 
 
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                MarkerOptions options = new MarkerOptions();
+                options.title("Current position");
+                options.position(new LatLng(Coordinates.latitude,Coordinates.longitude));
+                mapboxMap.addMarker(options);
+            }
+        });
+
+
+
+
+
+
+
     }
+
+
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
-
-
-
-
-
 
         map = mapboxMap;
         enableLocation();

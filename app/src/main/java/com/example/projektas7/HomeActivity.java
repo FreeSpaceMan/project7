@@ -37,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
 
 //        Coordinates.latitude = 15;
 //        Coordinates.longitude = 56;
+//        Log.d("TAG", "Size of messages array list: " +userMessages.size());
 
 
         SharedPreferences sharedPref = getSharedPreferences("UserData", MODE_PRIVATE);

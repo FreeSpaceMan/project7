@@ -9,6 +9,16 @@ public class UserMessages {
     private double latitude;
     private double longitude;
 
+    public UserMessages(int id, String message, int userid, String username, long date, double latitude, double longitude) {
+        this.id = id;
+        this.message = message;
+        this.userid = userid;
+        this.username = username;
+        this.date = date;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public int getId() {
         return id;
     }
