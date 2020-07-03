@@ -70,8 +70,12 @@ dependencies {
 
     // Mapbox dependancies. Check if there are newer versions of dependencies below
 
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.0.1'
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.0'
+//    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.0.1' //this is the old SDK that was derprecated and repalced with the one that I added below
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.2.0'
+//    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.0' // THIS IS DEPRECATED
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:0.8.0'
+
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-core:3.0.0'
 
 //    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:4.3.0'
 //    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-places-v7:0.7.0'

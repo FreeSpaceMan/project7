@@ -53,13 +53,14 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
+
+
     }
 
     public void openMapActivity() {
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
     }
-
 
 
 

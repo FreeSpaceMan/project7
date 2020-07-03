@@ -14,4 +14,6 @@
     <string name="goToMap">go to the map</string>
     <string name="goToStream">go to the streaming</string>
     <string name="goToCamera">go to the AR view</string>
+    <string name="user_location_permission_explanation">user_location_permission_explanation</string>
+    <string name="user_location_permission_not_granted">user_location_permission_not_granted</string>
 </resources>

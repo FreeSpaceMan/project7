@@ -12,7 +12,7 @@
         android:layout_height="0dp"
         mapbox:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         mapbox:layout_constraintTop_toTopOf="parent"
-        mapbox:layout_constraintBottom_toTopOf="@+id/layout_chatbox"
+        mapbox:layout_constraintBottom_toTopOf="@+id/mapView"
         tools:itemCount="10"
         android:layout_marginBottom="10dp"
         mapbox:layout_constraintStart_toStartOf="parent"
@@ -21,20 +21,6 @@
         tools:listitem="@layout/item_messaging"/>
 
 
-
-
-<!--            <androidx.core.widget.NestedScrollView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                mapbox:layout_constraintBottom_toTopOf="@+id/layout_chatbox">-->
-<!--            <TextView-->
-<!--                android:id="@+id/check_sql"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_margin="10dp"-->
-<!--                android:textSize="30sp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                />-->
-<!--            </androidx.core.widget.NestedScrollView>-->
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
@@ -45,7 +31,7 @@
         mapbox:mapbox_cameraTargetLat="37.7749"
         mapbox:mapbox_cameraTargetLng="-122.4194"
         mapbox:mapbox_cameraZoom="12"
-        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10" />
+         />
 
     <LinearLayout
         android:id="@+id/layout_chatbox"
@@ -54,7 +40,7 @@
         android:background="#ffffff"
         android:minHeight="60dp"
         android:orientation="horizontal"
-        mapbox:layout_constraintBottom_toTopOf="@+id/mapView"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
         mapbox:layout_constraintStart_toStartOf="parent">
 

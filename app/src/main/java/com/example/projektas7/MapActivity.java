@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -16,24 +17,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.internal.$Gson$Preconditions;
+
 import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineListener;
-import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.Style;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,17 +52,24 @@ import static com.example.projektas7.LoginActivity.NAME;
 import static com.example.projektas7.LoginActivity.SURNAME;
 import static com.example.projektas7.LoginActivity.USERNAME;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
+public class MapActivity extends AppCompatActivity implements
+        OnMapReadyCallback, PermissionsListener {
 
-    private MapView mapView = null;
-    private MapboxMap map;
+
+
+
+    private MapView mapView;
+
+    private MapboxMap mapboxMap;
+
     private PermissionsManager permissionsManager;
-    private LocationEngine locationEngine;
-    private LocationLayerPlugin locationLayerPlugin;
-    private Location originLocation;
+    private LocationComponent locationComponent;
+
     private TextView textView,textViewMessages;
     private EditText messagingInput;
     private Button btnChatSend;
+
+
 
 
     ArrayList<UserMessages> usersMessages = new ArrayList<>();
@@ -74,8 +84,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Mapbox.getInstance(this,getString(R.string.access_token));
+
         setContentView(R.layout.activity_map);
+
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
@@ -84,10 +97,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         userMessages_recyclerview=(RecyclerView)findViewById(R.id.streaming_list);
         userMessages_recyclerview.setLayoutManager(new LinearLayoutManager(this));
 
-
-
-
-//        textViewMessages = (TextView)findViewById(R.id.check_sql);
         btnChatSend = (Button)findViewById(R.id.button_chatbox_send);
 
         SharedPreferences sharedPref = getSharedPreferences("UserData", MODE_PRIVATE);
@@ -128,11 +137,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-
-
-
-
-
         Call<List<UserMessages>> call = apiService.getMePosts();
 
         call.enqueue(new Callback<List<UserMessages>>() {
@@ -151,53 +155,59 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
 
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                MarkerOptions options = new MarkerOptions();
-                options.title("Current position");
-                options.position(new LatLng(Coordinates.latitude,Coordinates.longitude));
-                mapboxMap.addMarker(options);
-            }
-        });
-
-
-
-
-
-
 
     }
 
-
+    //****************************************************************************************************************************************************
+    //****************************************************************************************************************************************************
+    // NEW MAPBOX CODE BELOW!*****************************************************************************************************************************
+    //****************************************************************************************************************************************************
+    //****************************************************************************************************************************************************
 
     @Override
-    public void onMapReady(MapboxMap mapboxMap) {
-
-        map = mapboxMap;
-        enableLocation();
-
-        Coordinates.latitude = locationEngine.getLastLocation().getLatitude();
-        Coordinates.longitude = locationEngine.getLastLocation().getLongitude();
-
-        String latitudeTxt = String.valueOf(Coordinates.latitude);
-        String longitudeTxt = String.valueOf(Coordinates.longitude);
-
-
-        textView.setText(String.format(getString(R.string.new_location),
-                latitudeTxt,
-                longitudeTxt));
-        Toast.makeText(this, String.format(getString(R.string.new_location),
-                latitudeTxt,
-                longitudeTxt),
-                Toast.LENGTH_SHORT).show();
-
+    public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+        MapActivity.this.mapboxMap = mapboxMap;
+//fromUri("mapbox://styles/mapbox/cjerxnqt3cgvp2rmyuxbeqme7"),
+        mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/mapbox/satellite-v9"),
+                new Style.OnStyleLoaded() {
+                    @Override
+                    public void onStyleLoaded(@NonNull Style style) {
+                        enableLocationComponent(style);
+                    }
+                });
     }
 
-    private void enableLocation() {
+    @SuppressWarnings( {"MissingPermission"})
+    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
+// Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
-            initializeLocationEngine();
-            initializeLocationLayer();
+
+// Get an instance of the component
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
+
+// Activate with options
+            locationComponent.activateLocationComponent(
+                    LocationComponentActivationOptions.builder(this, loadedMapStyle).build());
+
+// Enable to make component visible
+            locationComponent.setLocationComponentEnabled(true);
+
+// Set the component's camera mode
+            locationComponent.setCameraMode(CameraMode.TRACKING);
+
+// Set the component's render mode
+            locationComponent.setRenderMode(RenderMode.COMPASS);
+
+            if (locationComponent.getLastKnownLocation() != null) {
+                Coordinates.latitude = locationComponent.getLastKnownLocation().getLatitude();
+                Coordinates.longitude = locationComponent.getLastKnownLocation().getLongitude();
+                    Toast.makeText(this, String.format(getString(R.string.new_location),
+                            String.valueOf(locationComponent.getLastKnownLocation().getLatitude()),
+                            String.valueOf(locationComponent.getLastKnownLocation().getLongitude())), Toast.LENGTH_LONG).show();
+            }
+
+
+
         } else {
             permissionsManager = new PermissionsManager(this);
             permissionsManager.requestLocationPermissions(this);
@@ -205,88 +215,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    @SuppressWarnings("MissingPermission")
-    private void initializeLocationEngine() {
-        locationEngine = LocationEngineFactory.getLocationEngine(this);
-
-//        locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
-//        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-//        locationEngine.activate();
-//        Location lastLocation = locationEngine.getLastLocation();
-//        if(lastLocation != null) {
-//            originLocation = lastLocation;
-//            setCameraPosition(lastLocation);
-//        } else {
-//            locationEngine.addLocationEngineListener(this);
-//        }
-
-        setLocationProperties();
-    }
-
-    public void setLocationProperties() {
-        Location lastLocation = locationEngine.getLastLocation();
-        if(lastLocation != null) {
-            originLocation = lastLocation;
-            setCameraPosition(lastLocation);
-        } else {
-            locationEngine.addLocationEngineListener(this);
-        }
-    }
-
-    private void initializeLocationLayer() {
-        locationLayerPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
-        locationLayerPlugin.setLocationLayerEnabled(true);
-        locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
-        locationLayerPlugin.setRenderMode(RenderMode.NORMAL);
-    }
-
-    private void setCameraPosition(Location location) {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
-                location.getLongitude()),13));
-    }
-
-    @Override
-    @SuppressWarnings("MissingPermission")
-    public void onConnected() {
-        locationEngine.removeLocationUpdates();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if (location != null) {
-            originLocation = location;
-            setCameraPosition(location);
-        }
-    }
-
-    @Override
-    public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(this,"Por favor! Enable the location!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPermissionResult(boolean granted) {
-        if (granted) {
-            enableLocation();
-        }
-
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    @SuppressWarnings("MissingPermission")
     @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            mapboxMap.getStyle(new Style.OnStyleLoaded() {
+                @Override
+                public void onStyleLoaded(@NonNull Style style) {
+                    enableLocationComponent(style);
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.user_location_permission_not_granted, Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    @Override
+    @SuppressWarnings( {"MissingPermission"})
     protected void onStart() {
         super.onStart();
-        if (locationEngine != null) {
-            locationEngine.removeLocationUpdates();
-            if (locationLayerPlugin != null) {
-                locationLayerPlugin.onStart();
-            }
-        }
         mapView.onStart();
     }
 
@@ -305,34 +262,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onStop() {
         super.onStop();
-        if (locationEngine != null) {
-            locationEngine.removeLocationUpdates();
-        }
-        if (locationLayerPlugin != null) {
-            locationLayerPlugin.onStop();
-        }
-        mapView.onStop();;
+        mapView.onStop();
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (locationEngine != null) {
-            locationEngine.deactivate();
-        }
-        mapView.onDestroy();
     }
 
 
