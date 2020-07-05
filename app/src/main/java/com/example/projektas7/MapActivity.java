@@ -5,10 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,15 +16,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineCallback;
-import com.mapbox.android.core.location.LocationEngineProvider;
-import com.mapbox.android.core.location.LocationEngineRequest;
-import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -35,10 +33,11 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -46,10 +45,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.example.projektas7.LoginActivity.EMAIL;
 import static com.example.projektas7.LoginActivity.ID;
-import static com.example.projektas7.LoginActivity.NAME;
-import static com.example.projektas7.LoginActivity.SURNAME;
 import static com.example.projektas7.LoginActivity.USERNAME;
 
 public class MapActivity extends AppCompatActivity implements
@@ -76,7 +72,9 @@ public class MapActivity extends AppCompatActivity implements
     private UserAdapter userAdapter;
     private RecyclerView userMessages_recyclerview;
 
-
+    private static final String MARKER_SOURCE = "markers-source";
+    private static final String MARKER_STYLE_LAYER = "markers-style-layer";
+    private static final String MARKER_IMAGE = "custom-marker";
 
 
 
@@ -112,10 +110,12 @@ public class MapActivity extends AppCompatActivity implements
                 String userIdX = sharedPref.getString(ID,"");
                 String usernameX = sharedPref.getString(USERNAME,"");
 
+                messagingInput.getText().clear();
+
                 if(messageSent.equals("")){
                     Toast.makeText(MapActivity.this,"Please insert a message", Toast.LENGTH_SHORT).show();
                 }else{
-
+                    Toast.makeText(MapActivity.this,"Message sent", Toast.LENGTH_SHORT).show();
                     apiService.insertMessage(""+messageSent,
                             ""+userIdX,
                             ""+usernameX,
@@ -125,7 +125,6 @@ public class MapActivity extends AppCompatActivity implements
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                             Log.d("MapActivity","SUCCESS");
                         }
-
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
                             Log.d("MapActivity","FAILURE");
@@ -133,7 +132,6 @@ public class MapActivity extends AppCompatActivity implements
                         }
                     });
                 }
-
             }
         });
 
@@ -143,6 +141,7 @@ public class MapActivity extends AppCompatActivity implements
             @Override
             public void onResponse(Call<List<UserMessages>> call, Response<List<UserMessages>> response) {
                 usersMessages = new ArrayList<>(response.body());
+                Coordinates.trialList = new ArrayList<>(response.body());
                 userAdapter = new UserAdapter(MapActivity.this,usersMessages);
                 userMessages_recyclerview.setAdapter(userAdapter);
             }
@@ -155,27 +154,65 @@ public class MapActivity extends AppCompatActivity implements
         });
 
 
-
     }
-
-    //****************************************************************************************************************************************************
-    //****************************************************************************************************************************************************
-    // NEW MAPBOX CODE BELOW!*****************************************************************************************************************************
-    //****************************************************************************************************************************************************
-    //****************************************************************************************************************************************************
 
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         MapActivity.this.mapboxMap = mapboxMap;
 //fromUri("mapbox://styles/mapbox/cjerxnqt3cgvp2rmyuxbeqme7"),
-        mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/mapbox/satellite-v9"),
+        mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/niekselis/ckc6d1vgs15st1ip2kloy9emo"),
                 new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         enableLocationComponent(style);
+//                        style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
+//                                MapActivity.this.getResources(), R.drawable.custom_marker));
+//                        addMarkers(style);
                     }
                 });
+
+
+        String markerTitleText = new String();
+        String markerTitleText_1 = new String();
+        for (int i = 0; i<Coordinates.trialList.size();i++) {
+            markerTitleText_1 = String.valueOf(Coordinates.trialList.get(i).getUsername());
+             markerTitleText = markerTitleText_1 +" says: "+String.valueOf(Coordinates.trialList.get(i).getMessage());
+        mapboxMap.addMarker(new MarkerOptions()
+                .position(new LatLng(Coordinates.trialList.get(i).getLatitude(), Coordinates.trialList.get(i).getLongitude()))
+                .title(markerTitleText));}
+//         .title(String.valueOf(Coordinates.trialList.get(i).getMessage())));}
+
+//        mapboxMap.addMarker(new MarkerOptions()
+//                .position(new LatLng(Coordinates.trialList.get(24).getLatitude(), Coordinates.trialList.get(24).getLongitude()))
+//                .title(String.valueOf(Coordinates.trialList.get(24).getMessage())));
     }
+
+    private void addMarkers(@NonNull Style loadedMapStyle) {
+        List<Feature> features = new ArrayList<>();
+        for (int i = 0; i<Coordinates.trialList.size();i++) {
+        features.add(Feature.fromGeometry(Point.fromLngLat(Coordinates.trialList.get(i).getLongitude()+1, Coordinates.trialList.get(i).getLatitude()+1)));}
+//        features.add(Feature.fromGeometry(Point.fromLngLat(Coordinates.trialList.get(1).getLongitude()+1, Coordinates.trialList.get(1).getLatitude()+1)));
+
+        /* Source: A data source specifies the geographic coordinate where the image marker gets placed. */
+
+        loadedMapStyle.addSource(new GeoJsonSource(MARKER_SOURCE, FeatureCollection.fromFeatures(features)));
+
+        /* Style layer: A style layer ties together the source and image and specifies how they are displayed on the map. */
+        loadedMapStyle.addLayer(new SymbolLayer(MARKER_STYLE_LAYER, MARKER_SOURCE)
+                .withProperties(
+                        PropertyFactory.iconAllowOverlap(true),
+                        PropertyFactory.iconIgnorePlacement(true),
+                        PropertyFactory.iconImage(MARKER_IMAGE),
+// Adjust the second number of the Float array based on the height of your marker image.
+// This is because the bottom of the marker should be anchored to the coordinate point, rather
+// than the middle of the marker being the anchor point on the map.
+                        PropertyFactory.iconOffset(new Float[] {0f, -52f})
+                ));
+    }
+
+
+
+
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
@@ -282,8 +319,5 @@ public class MapActivity extends AppCompatActivity implements
         super.onLowMemory();
         mapView.onLowMemory();
     }
-
-
-
 
 }

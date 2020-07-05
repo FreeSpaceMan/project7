@@ -20,12 +20,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import static com.example.projektas7.LoginActivity.USERNAME;
 
 
 public class HomeActivity extends AppCompatActivity {
     private Button btnGoToMap;
+
+    private TextView textView;
 
 //
     private SharedPreferences sharedPref;
@@ -35,9 +39,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-//        Coordinates.latitude = 15;
-//        Coordinates.longitude = 56;
-//        Log.d("TAG", "Size of messages array list: " +userMessages.size());
+        textView = (TextView) findViewById(R.id.textView_check);
+        textView.setText(String.valueOf(10));
+
+
 
 
         SharedPreferences sharedPref = getSharedPreferences("UserData", MODE_PRIVATE);
@@ -50,9 +55,7 @@ public class HomeActivity extends AppCompatActivity {
                 openMapActivity();
             }
         });
-
-
-
+//
 
 
     }

@@ -3,16 +3,18 @@
     android:shape="rectangle">
 
     <!-- View background color -->
+
     <solid
-        android:color="#ffba52">
+        android:color="#000000">
 
     </solid>
 
     <!-- The radius makes the corners rounded -->
     <corners
-        android:radius="20dp">
+        android:radius="10dp">
     </corners>
 </shape>
+
 
     <!--<TextView-->
     <!--android:text="hi man, how are you?"-->

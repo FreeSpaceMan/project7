@@ -15,7 +15,16 @@
         android:text="@string/goToMap"
         android:layout_marginTop="25dp" />
 
+    <TextView
 
+        android:layout_below="@+id/button_goToMap"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:id="@+id/textView_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
 
 
 </RelativeLayout>

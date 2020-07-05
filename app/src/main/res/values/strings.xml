@@ -16,4 +16,5 @@
     <string name="goToCamera">go to the AR view</string>
     <string name="user_location_permission_explanation">user_location_permission_explanation</string>
     <string name="user_location_permission_not_granted">user_location_permission_not_granted</string>
+    <string name="say_something">say something</string>
 </resources>
