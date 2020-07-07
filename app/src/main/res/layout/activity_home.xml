@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".HomeActivity">
 
     <Button
@@ -46,12 +47,13 @@
         app:layout_constraintTop_toBottomOf="@+id/circle_radius_textview" />
 
     <TextView
+        android:layout_marginTop="24dp"
         android:id="@+id/distance_units_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         android:gravity="center"
-        android:text="Unit:"
+        android:text="Units:"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@+id/circle_radius_seekbar"

@@ -195,6 +195,9 @@ public class MapActivity extends AppCompatActivity implements
         String markerTitleText = new String();
         String markerTitleText_1 = new String();
         double distanceCriteria;
+        double radiusForCriteria=setRadiusCrit(Coordinates.selectedRadius,Coordinates.selectedUnits);
+
+
         for (int i = 0; i<Coordinates.trialList.size();i++) {
             markerTitleText_1 = String.valueOf(Coordinates.trialList.get(i).getUsername());
              markerTitleText = markerTitleText_1 +" says: "+String.valueOf(Coordinates.trialList.get(i).getMessage());
@@ -203,7 +206,7 @@ public class MapActivity extends AppCompatActivity implements
              distanceCriteria = Math.pow(Math.pow(Coordinates.latitude-Coordinates.trialList.get(i).getLatitude(),2)+
                      Math.pow(Coordinates.longitude-Coordinates.trialList.get(i).getLongitude(),2),0.5);
 
-            if (distanceCriteria<0.02){
+            if (distanceCriteria<radiusForCriteria){
         mapboxMap.addMarker(new MarkerOptions()
                 .position(new LatLng(Coordinates.trialList.get(i).getLatitude(), Coordinates.trialList.get(i).getLongitude()))
                 .title(markerTitleText));}}
@@ -268,9 +271,12 @@ public class MapActivity extends AppCompatActivity implements
             if (locationComponent.getLastKnownLocation() != null) {
                 Coordinates.latitude = locationComponent.getLastKnownLocation().getLatitude();
                 Coordinates.longitude = locationComponent.getLastKnownLocation().getLongitude();
-                    Toast.makeText(this, String.format(getString(R.string.new_location),
-                            String.valueOf(locationComponent.getLastKnownLocation().getLatitude()),
-                            String.valueOf(locationComponent.getLastKnownLocation().getLongitude())), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(this, String.format(getString(R.string.new_location),
+//                            String.valueOf(locationComponent.getLastKnownLocation().getLatitude()),
+//                            String.valueOf(locationComponent.getLastKnownLocation().getLongitude())), Toast.LENGTH_LONG).show();
+
+                Toast.makeText(this,String.valueOf(setRadiusCrit(Coordinates.selectedRadius,Coordinates.selectedUnits)), Toast.LENGTH_LONG).show();
+
             }
 
 
@@ -348,6 +354,21 @@ public class MapActivity extends AppCompatActivity implements
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+
+    private static double setRadiusCrit(int selectedRadius,String selectedUnits){
+       double radiusForCriteria=0;
+        if(selectedUnits.equals("meters")){
+            radiusForCriteria = selectedRadius/100000d;
+        }
+        else if(selectedUnits.equals("kilometers")){
+            radiusForCriteria = selectedRadius/100d;
+        }
+        else if(selectedUnits.equals("miles")){
+           radiusForCriteria = selectedRadius/(100*1.609d);
+        }
+        return radiusForCriteria;
     }
 
 }

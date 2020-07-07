@@ -19,8 +19,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,27 +35,61 @@ import static com.mapbox.turf.TurfConstants.UNIT_MILES;
 import static com.mapbox.turf.TurfConstants.UNIT_RADIANS;
 
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button btnGoToMap;
 
+    private TextView textView_SeekBar;
+    private SeekBar seekBar;
+    private Spinner spinner;
+
+
+    private static final int RADIUS_SEEKBAR_DIFFERENCE = 1;
+    private static final int RADIUS_SEEKBAR_MAX = 500;
 
 
 //
     private SharedPreferences sharedPref;
 
 
-    //pirmadienio kodas zemiau
-    private static final int RADIUS_SEEKBAR_DIFFERENCE = 1;//pirmadienio kodas
-    private static final int RADIUS_SEEKBAR_MAX = 500;//pirmadienio kodas
 
-    // Not static final because they will be adjusted by the seekbars and spinner menu
-    private String circleUnit = UNIT_KILOMETERS;
-    private int circleRadius = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        textView_SeekBar = (TextView) findViewById(R.id.circle_radius_textview);
+        seekBar = (SeekBar) findViewById(R.id.circle_radius_seekbar);
+        seekBar.setMax(RADIUS_SEEKBAR_MAX + RADIUS_SEEKBAR_DIFFERENCE);
+        seekBar.incrementProgressBy(RADIUS_SEEKBAR_DIFFERENCE);
+        seekBar.setProgress(RADIUS_SEEKBAR_MAX / 2);
+
+        Spinner spinner = findViewById(R.id.circle_units_spinner);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekBar.setProgress(progress);
+                Coordinates.selectedRadius = progress;
+                textView_SeekBar.setText(String.format(getString(R.string.polygon_circle_transformation_circle_radius)) + progress+" "+Coordinates.selectedUnits );
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                //Not using this
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.units, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
 
 
@@ -71,17 +108,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-        final SeekBar circleRadiusSeekbar = findViewById(R.id.circle_radius_seekbar);
-        circleRadiusSeekbar.setMax(RADIUS_SEEKBAR_MAX + RADIUS_SEEKBAR_DIFFERENCE);
-        circleRadiusSeekbar.incrementProgressBy(RADIUS_SEEKBAR_DIFFERENCE);
-        circleRadiusSeekbar.setProgress(RADIUS_SEEKBAR_MAX / 2);
 
-
-
-        final TextView circleRadiusTextView = findViewById(R.id.circle_radius_textview);
-        circleRadiusTextView.setText(String.format(getString(
-                R.string.polygon_circle_transformation_circle_radius),
-                circleRadiusSeekbar.getProgress()));
 
 
     }
@@ -92,6 +119,15 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String text = "Selected units: " + parent.getItemAtPosition(position).toString();
+        Coordinates.selectedUnits = parent.getItemAtPosition(position).toString();
+        Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
+    }
 }

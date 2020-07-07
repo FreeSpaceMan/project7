@@ -17,5 +17,10 @@
     <string name="user_location_permission_explanation">user_location_permission_explanation</string>
     <string name="user_location_permission_not_granted">user_location_permission_not_granted</string>
     <string name="say_something">say something</string>
-    <string name="polygon_circle_transformation_circle_radius">Radius</string>
+    <string name="polygon_circle_transformation_circle_radius">Radius: </string>
+    <string-array name="units">
+        <item>meters</item>
+        <item>kilometers</item>
+        <item>miles</item>
+    </string-array>
 </resources>

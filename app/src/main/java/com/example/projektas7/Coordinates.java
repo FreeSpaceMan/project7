@@ -9,4 +9,7 @@ public class Coordinates {
 
     public static ArrayList<UserMessages> trialList = new ArrayList<>();
 
+    public static String selectedUnits;
+    public static int selectedRadius;
+
 }
