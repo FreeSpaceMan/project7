@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.projektas7"
-        minSdkVersion 23
+        minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -82,6 +82,10 @@ dependencies {
     implementation ('com.mapbox.mapboxsdk:mapbox-android-geocoder:1.0.0@aar'){
         transitive=true
     }
+
+    implementation group: 'com.mapbox.mapboxsdk', name: 'mapbox-sdk-turf', version: '3.3.0'
+//Thanks for using https://jar-download.com
+
 //    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v7:0.4.0'
 //    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v9:0.4.0'
 

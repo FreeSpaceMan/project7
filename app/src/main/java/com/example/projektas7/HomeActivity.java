@@ -20,27 +20,40 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.example.projektas7.LoginActivity.USERNAME;
 
+import static com.mapbox.turf.TurfConstants.UNIT_DEGREES;
+import static com.mapbox.turf.TurfConstants.UNIT_KILOMETERS;
+import static com.mapbox.turf.TurfConstants.UNIT_MILES;
+import static com.mapbox.turf.TurfConstants.UNIT_RADIANS;
+
 
 public class HomeActivity extends AppCompatActivity {
     private Button btnGoToMap;
 
-    private TextView textView;
+
 
 //
     private SharedPreferences sharedPref;
+
+
+    //pirmadienio kodas zemiau
+    private static final int RADIUS_SEEKBAR_DIFFERENCE = 1;//pirmadienio kodas
+    private static final int RADIUS_SEEKBAR_MAX = 500;//pirmadienio kodas
+
+    // Not static final because they will be adjusted by the seekbars and spinner menu
+    private String circleUnit = UNIT_KILOMETERS;
+    private int circleRadius = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        textView = (TextView) findViewById(R.id.textView_check);
-        textView.setText(String.valueOf(10));
 
 
 
@@ -55,7 +68,20 @@ public class HomeActivity extends AppCompatActivity {
                 openMapActivity();
             }
         });
-//
+
+
+
+        final SeekBar circleRadiusSeekbar = findViewById(R.id.circle_radius_seekbar);
+        circleRadiusSeekbar.setMax(RADIUS_SEEKBAR_MAX + RADIUS_SEEKBAR_DIFFERENCE);
+        circleRadiusSeekbar.incrementProgressBy(RADIUS_SEEKBAR_DIFFERENCE);
+        circleRadiusSeekbar.setProgress(RADIUS_SEEKBAR_MAX / 2);
+
+
+
+        final TextView circleRadiusTextView = findViewById(R.id.circle_radius_textview);
+        circleRadiusTextView.setText(String.format(getString(
+                R.string.polygon_circle_transformation_circle_radius),
+                circleRadiusSeekbar.getProgress()));
 
 
     }

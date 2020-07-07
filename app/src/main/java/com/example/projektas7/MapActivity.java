@@ -5,10 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PointF;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,6 +30,7 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.BubbleLayout;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
@@ -37,7 +45,11 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -47,9 +59,19 @@ import retrofit2.Response;
 
 import static com.example.projektas7.LoginActivity.ID;
 import static com.example.projektas7.LoginActivity.USERNAME;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ANCHOR_BOTTOM;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
+import static java.nio.file.Paths.get;
 
 public class MapActivity extends AppCompatActivity implements
         OnMapReadyCallback, PermissionsListener {
+
+
 
 
 
@@ -75,8 +97,6 @@ public class MapActivity extends AppCompatActivity implements
     private static final String MARKER_SOURCE = "markers-source";
     private static final String MARKER_STYLE_LAYER = "markers-style-layer";
     private static final String MARKER_IMAGE = "custom-marker";
-
-
 
 
     @Override
@@ -174,18 +194,28 @@ public class MapActivity extends AppCompatActivity implements
 
         String markerTitleText = new String();
         String markerTitleText_1 = new String();
+        double distanceCriteria;
         for (int i = 0; i<Coordinates.trialList.size();i++) {
             markerTitleText_1 = String.valueOf(Coordinates.trialList.get(i).getUsername());
              markerTitleText = markerTitleText_1 +" says: "+String.valueOf(Coordinates.trialList.get(i).getMessage());
+
+
+             distanceCriteria = Math.pow(Math.pow(Coordinates.latitude-Coordinates.trialList.get(i).getLatitude(),2)+
+                     Math.pow(Coordinates.longitude-Coordinates.trialList.get(i).getLongitude(),2),0.5);
+
+            if (distanceCriteria<0.02){
         mapboxMap.addMarker(new MarkerOptions()
                 .position(new LatLng(Coordinates.trialList.get(i).getLatitude(), Coordinates.trialList.get(i).getLongitude()))
-                .title(markerTitleText));}
+                .title(markerTitleText));}}
 //         .title(String.valueOf(Coordinates.trialList.get(i).getMessage())));}
 
 //        mapboxMap.addMarker(new MarkerOptions()
 //                .position(new LatLng(Coordinates.trialList.get(24).getLatitude(), Coordinates.trialList.get(24).getLongitude()))
 //                .title(String.valueOf(Coordinates.trialList.get(24).getMessage())));
     }
+
+
+
 
     private void addMarkers(@NonNull Style loadedMapStyle) {
         List<Feature> features = new ArrayList<>();
@@ -200,13 +230,13 @@ public class MapActivity extends AppCompatActivity implements
         /* Style layer: A style layer ties together the source and image and specifies how they are displayed on the map. */
         loadedMapStyle.addLayer(new SymbolLayer(MARKER_STYLE_LAYER, MARKER_SOURCE)
                 .withProperties(
-                        PropertyFactory.iconAllowOverlap(true),
+                        iconAllowOverlap(true),
                         PropertyFactory.iconIgnorePlacement(true),
-                        PropertyFactory.iconImage(MARKER_IMAGE),
+                        iconImage(MARKER_IMAGE),
 // Adjust the second number of the Float array based on the height of your marker image.
 // This is because the bottom of the marker should be anchored to the coordinate point, rather
 // than the middle of the marker being the anchor point on the map.
-                        PropertyFactory.iconOffset(new Float[] {0f, -52f})
+                        iconOffset(new Float[] {0f, -52f})
                 ));
     }
 
