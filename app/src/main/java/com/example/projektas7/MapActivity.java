@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -116,6 +117,8 @@ public class MapActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        final MediaPlayer mp = MediaPlayer.create(this,R.ma);
 
         Mapbox.getInstance(this,getString(R.string.access_token));
 
@@ -383,7 +386,7 @@ public class MapActivity extends AppCompatActivity implements
             radiusForCriteria = selectedRadius/100d;
         }
         else if(selectedUnits.equals("miles")){
-           radiusForCriteria = selectedRadius/(100*1.609d);
+           radiusForCriteria = (selectedRadius*1.609d)/100;
         }
         return radiusForCriteria;
     }

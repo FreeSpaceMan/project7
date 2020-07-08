@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,"Please enter all the mandatory fields", Toast.LENGTH_SHORT).show(); // this bit is ok
                 }
                 //TODO need to check when registering if the username is not taken already. Could this be done by modyfing the login code?
-                if(pass.equals(repass)){
+                else if(pass.equals(repass)){
                     apiService.register(
                             ""+nameOfUser,
                             ""+surnameOfUser,

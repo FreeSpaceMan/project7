@@ -14,6 +14,7 @@
 
         <ImageView
             android:id="@+id/user_image"
+            android:src="@drawable/king_card"
             android:layout_width="100dp"
             android:layout_height="60dp"/>
         <LinearLayout

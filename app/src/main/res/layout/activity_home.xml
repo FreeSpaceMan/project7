@@ -20,6 +20,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/homePageInfo"
+        android:textSize="18sp"
+        android:textColor="@color/lGreenMatchingMap"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Please select radius and units to see messages around you"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/button_goToMap"/>
+
+    <TextView
         android:textColor="@color/lGreenMatchingMap"
         android:id="@+id/circle_radius_textview"
         android:layout_width="0dp"
@@ -35,7 +49,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_goToMap" />
+        app:layout_constraintTop_toBottomOf="@+id/homePageInfo" />
 
     <SeekBar
         android:id="@+id/circle_radius_seekbar"
@@ -66,23 +80,19 @@
         tools:layout_editor_absoluteX="8dp" />
 
 
-
     <Spinner
-        android:textColor="@color/lGreenMatchingMap"
         android:id="@+id/circle_units_spinner"
-        android:spinnerMode="dropdown"
-        android:background="@android:color/transparent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:background="@color/lGreenMatchingMap"
+        android:spinnerMode="dropdown"
+        android:textColor="@color/lGreenMatchingMap"
         app:layout_constraintBottom_toBottomOf="@+id/distance_units_textview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/distance_units_textview"
-        app:layout_constraintTop_toTopOf="@+id/distance_units_textview">
-    </Spinner>
+        app:layout_constraintTop_toTopOf="@+id/distance_units_textview"></Spinner>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

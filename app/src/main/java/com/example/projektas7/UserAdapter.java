@@ -37,6 +37,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull UserAdapter.ViewHolder viewHolder, int i) {
         viewHolder.user_name.setText(usersMessages.get(i).getUsername());
         viewHolder.user_message.setText(usersMessages.get(i).getMessage());
+        viewHolder.user_image.setImageResource(R.drawable.king_card);
 
 //        Picasso.get().load(carsModels.get(i).getImage()).into(viewHolder.car_image);
 //        notifyDataSetChanged();
@@ -53,7 +54,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-//            user_image=(ImageView)itemView.findViewById(R.id.user_image);
+            user_image=(ImageView)itemView.findViewById(R.id.user_image);
             user_name=(TextView)itemView.findViewById(R.id.user_name);
             user_message=(TextView)itemView.findViewById(R.id.user_message);
         }

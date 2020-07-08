@@ -55,11 +55,14 @@ public class LoginActivity extends AppCompatActivity {
             if(user.equals("") || pass.equals("")) {
                 Toast.makeText(LoginActivity.this,"Please enter all the fields", Toast.LENGTH_SHORT).show();}
             else{
+
             apiService.login(""+user,""+pass).enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
                     User user = response.body();
                     if (response.isSuccessful()) {
+                        username.getText().clear();
+                        password.getText().clear();
                         saveUser(user);
                         Toast.makeText(LoginActivity.this,"Sign in is successful",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
