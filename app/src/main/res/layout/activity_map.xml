@@ -37,7 +37,7 @@
         android:id="@+id/layout_chatbox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#ffffff"
+        android:background="@color/pitchBlack"
         android:minHeight="60dp"
         android:orientation="horizontal"
         mapbox:layout_constraintBottom_toBottomOf="parent"
@@ -45,9 +45,11 @@
         mapbox:layout_constraintStart_toStartOf="parent">
 
         <EditText
+            android:textColor="@color/lGreenMatchingMap"
+            android:textColorHint="@color/lGreenMatchingMap"
             android:id="@+id/messaging_input"
             android:layout_width="0dp"
-            android:background="@android:color/transparent"
+            android:background="@color/pitchBlack"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
@@ -58,10 +60,12 @@
             android:maxLines="6" />
 
         <Button
+
+            android:textColor="@color/lGreenMatchingMap"
             android:id="@+id/button_chatbox_send"
             android:text="SEND"
             android:textSize="20sp"
-            android:background="?attr/selectableItemBackground"
+            android:background="@color/buttonBackgGreen"
             android:clickable="true"
             android:layout_width="64dp"
             android:layout_height="match_parent"

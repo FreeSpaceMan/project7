@@ -7,9 +7,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".HomeActivity">
+    tools:context=".HomeActivity"
+    android:background="@color/pitchBlack">
 
     <Button
+        android:background="@color/buttonBackgGreen"
+        android:textColor="@color/lGreenMatchingMap"
         android:id="@+id/button_goToMap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,6 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:textColor="@color/lGreenMatchingMap"
         android:id="@+id/circle_radius_textview"
         android:layout_width="0dp"
         android:layout_height="27dp"
@@ -47,7 +51,9 @@
         app:layout_constraintTop_toBottomOf="@+id/circle_radius_textview" />
 
     <TextView
+        android:textColor="@color/lGreenMatchingMap"
         android:layout_marginTop="24dp"
+        android:ellipsize="marquee"
         android:id="@+id/distance_units_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -62,7 +68,10 @@
 
 
     <Spinner
+        android:textColor="@color/lGreenMatchingMap"
         android:id="@+id/circle_units_spinner"
+        android:spinnerMode="dropdown"
+        android:background="@android:color/transparent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

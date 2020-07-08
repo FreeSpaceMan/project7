@@ -19,6 +19,7 @@
     <string name="say_something">say something</string>
     <string name="polygon_circle_transformation_circle_radius">Radius: </string>
     <string-array name="units">
+
         <item>meters</item>
         <item>kilometers</item>
         <item>miles</item>

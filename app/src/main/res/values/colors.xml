@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#7303DAC5</color>
     <color name="colorDarkGreen">#507c69</color>
+    <color name="lGreenMatchingMap">#507c69</color>
+    <color name="pitchBlack">#000000</color>
+    <color name="buttonBackgGreen">#303b31</color>
 </resources>

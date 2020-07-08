@@ -95,6 +95,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
+
         SharedPreferences sharedPref = getSharedPreferences("UserData", MODE_PRIVATE);
 
 
@@ -103,6 +104,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 openMapActivity();
+
             }
         });
 

@@ -4,13 +4,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#507c69"
+        android:background="@color/lGreenMatchingMap"
         >
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_rectangle_1"
-        android:layout_margin="2dp">
+        android:layout_margin="0dp">
 
         <ImageView
             android:id="@+id/user_image"
@@ -26,12 +26,12 @@
                 android:textSize="24sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#507c69"/>
+                android:textColor="@color/lGreenMatchingMap"/>
             <TextView
                 android:id="@+id/user_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#507c69"/>
+                android:textColor="@color/lGreenMatchingMap"/>
         </LinearLayout>
     </RelativeLayout>
     </RelativeLayout>
