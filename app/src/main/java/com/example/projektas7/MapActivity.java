@@ -28,7 +28,9 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
+import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.BubbleLayout;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -41,9 +43,12 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.turf.TurfMeta;
+import com.mapbox.turf.TurfTransformation;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -62,11 +67,15 @@ import static com.example.projektas7.LoginActivity.USERNAME;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ANCHOR_BOTTOM;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 import static java.nio.file.Paths.get;
+import static com.mapbox.turf.TurfConstants.UNIT_MILES;
+import static com.mapbox.turf.TurfConstants.UNIT_KILOMETERS;
+import static com.mapbox.turf.TurfConstants.UNIT_METERS;
 
 public class MapActivity extends AppCompatActivity implements
         OnMapReadyCallback, PermissionsListener {
@@ -97,6 +106,11 @@ public class MapActivity extends AppCompatActivity implements
     private static final String MARKER_SOURCE = "markers-source";
     private static final String MARKER_STYLE_LAYER = "markers-style-layer";
     private static final String MARKER_IMAGE = "custom-marker";
+
+    private static final int CIRCLE_STEPS = 360;
+    private static final String CIRCLE_GEOJSON_SOURCE_ID = "CIRCLE_GEOJSON_SOURCE_ID";
+    private static final String CIRCLE_LAYER_ID = "CIRCLE_LAYER_ID";
+    private static final double FACTOR_DIFFERENCE_BETWEEN_CIRCLES = .1;
 
 
     @Override
@@ -180,7 +194,9 @@ public class MapActivity extends AppCompatActivity implements
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         MapActivity.this.mapboxMap = mapboxMap;
 //fromUri("mapbox://styles/mapbox/cjerxnqt3cgvp2rmyuxbeqme7"),
-        mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/niekselis/ckc6d1vgs15st1ip2kloy9emo"),
+        mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/niekselis/ckc6d1vgs15st1ip2kloy9emo").withSource(new GeoJsonSource(CIRCLE_GEOJSON_SOURCE_ID))
+                .withLayer(new FillLayer(CIRCLE_LAYER_ID, CIRCLE_GEOJSON_SOURCE_ID).withProperties(
+                        fillColor(getResources().getColor(R.color.colorAccent)))),
                 new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
@@ -188,6 +204,7 @@ public class MapActivity extends AppCompatActivity implements
 //                        style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
 //                                MapActivity.this.getResources(), R.drawable.custom_marker));
 //                        addMarkers(style);
+                        moveRing(Point.fromLngLat(Coordinates.longitude,Coordinates.latitude));
                     }
                 });
 
@@ -271,11 +288,11 @@ public class MapActivity extends AppCompatActivity implements
             if (locationComponent.getLastKnownLocation() != null) {
                 Coordinates.latitude = locationComponent.getLastKnownLocation().getLatitude();
                 Coordinates.longitude = locationComponent.getLastKnownLocation().getLongitude();
-//                    Toast.makeText(this, String.format(getString(R.string.new_location),
-//                            String.valueOf(locationComponent.getLastKnownLocation().getLatitude()),
-//                            String.valueOf(locationComponent.getLastKnownLocation().getLongitude())), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, String.format(getString(R.string.new_location),
+                            String.valueOf(locationComponent.getLastKnownLocation().getLatitude()),
+                            String.valueOf(locationComponent.getLastKnownLocation().getLongitude())), Toast.LENGTH_LONG).show();
 
-                Toast.makeText(this,String.valueOf(setRadiusCrit(Coordinates.selectedRadius,Coordinates.selectedUnits)), Toast.LENGTH_LONG).show();
+//                Toast.makeText(this,String.valueOf(setRadiusCrit(Coordinates.selectedRadius,Coordinates.selectedUnits)), Toast.LENGTH_LONG).show();
 
             }
 
@@ -370,5 +387,48 @@ public class MapActivity extends AppCompatActivity implements
         }
         return radiusForCriteria;
     }
+
+    private void moveRing(Point centerPoint) {
+        mapboxMap.getStyle(new Style.OnStyleLoaded() {
+            @Override
+            public void onStyleLoaded(@NonNull Style style) {
+
+// Use Turf to calculate the coordinates for the outer ring of the final Polygon
+                Polygon outerCirclePolygon = getTurfPolygon(Coordinates.selectedRadius, centerPoint);
+
+// Use Turf to calculate the coordinates for the inner ring of the final Polygon
+                Polygon innerCirclePolygon = getTurfPolygon(
+                        Coordinates.selectedRadius - (Coordinates.selectedRadius*FACTOR_DIFFERENCE_BETWEEN_CIRCLES), centerPoint);
+
+                GeoJsonSource outerCircleSource = style.getSourceAs(CIRCLE_GEOJSON_SOURCE_ID);
+
+                if (outerCircleSource != null) {
+// Use the two Polygon objects above to create the final Polygon that visually represents the ring.
+                    outerCircleSource.setGeoJson(Polygon.fromOuterInner(
+// Create outer LineString
+                            LineString.fromLngLats(TurfMeta.coordAll(outerCirclePolygon, false)),
+// Create inter LineString
+                            LineString.fromLngLats(TurfMeta.coordAll(innerCirclePolygon, false))
+                    ));
+                }
+            }
+        });
+    }
+
+    private Polygon getTurfPolygon(@NonNull double radius, Point centerPoint) {
+        String selectedUnitsString = new String();
+        if(Coordinates.selectedUnits.equals("meters")){
+            selectedUnitsString=UNIT_METERS;
+        }
+        else if(Coordinates.selectedUnits.equals("kilometers")){
+            selectedUnitsString=UNIT_KILOMETERS;
+        }
+        else if(Coordinates.selectedUnits.equals("miles")){
+            selectedUnitsString=UNIT_MILES;
+        }
+        return TurfTransformation.circle(centerPoint, radius, CIRCLE_STEPS, selectedUnitsString);
+    }
+
+
 
 }

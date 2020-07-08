@@ -44,7 +44,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     private static final int RADIUS_SEEKBAR_DIFFERENCE = 1;
-    private static final int RADIUS_SEEKBAR_MAX = 500;
+    private static final int RADIUS_SEEKBAR_MAX = 200;
 
 
 //
